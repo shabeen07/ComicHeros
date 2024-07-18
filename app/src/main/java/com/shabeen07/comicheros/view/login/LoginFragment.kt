@@ -57,11 +57,7 @@ class LoginFragment : Fragment() {
                 Snackbar.LENGTH_SHORT
             ).show()
             // navigate to home
-            navController.navigate(
-                R.id.action_loginFragment_to_homeFragment,
-                null,
-                NavOptions.Builder().setPopUpTo(R.id.loginFragment, true).build()
-            )
+            navController.navigate(R.id.action_loginFragment_to_homeFragment)
         } else {
             Snackbar.make(
                 view,
