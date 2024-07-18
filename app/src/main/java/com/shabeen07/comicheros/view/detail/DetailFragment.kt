@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -46,6 +47,8 @@ class DetailFragment : Fragment() {
                 is Resource.Error -> {
                     Log.d(TAG, "Error: ${it.message}")
                     viewProgressBar(false)
+                    // show alert dialog
+                    showAlertDialog(it.message)
                 }
 
                 is Resource.Loading -> {
@@ -62,6 +65,17 @@ class DetailFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun showAlertDialog(error: String) {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Failed to Load Details!")
+        builder.setMessage(error)
+        builder.setPositiveButton("OK") { dialog, _ ->
+            dialog.dismiss()
+        }
+        val alertDialog: AlertDialog = builder.create()
+        alertDialog.show()
     }
 
     private fun viewProgressBar(isShow: Boolean) {

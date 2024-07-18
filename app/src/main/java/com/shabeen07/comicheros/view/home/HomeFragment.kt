@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -51,6 +52,8 @@ class HomeFragment : Fragment(), CharacterItemAdapter.ItemClickCallback {
                 is Resource.Error -> {
                     Log.d(TAG, "Error: ${it.message}")
                     viewProgressBar(false)
+                    // show error dialog
+                    showAlertDialog(it.message)
                 }
 
                 is Resource.Loading -> {
@@ -70,6 +73,17 @@ class HomeFragment : Fragment(), CharacterItemAdapter.ItemClickCallback {
 
     }
 
+    private fun showAlertDialog(error: String) {
+        val builder = AlertDialog.Builder(requireContext())
+        builder.setTitle("Failed to Load Characters!")
+        builder.setMessage(error)
+        builder.setPositiveButton("OK") { dialog, _ ->
+            dialog.dismiss()
+        }
+        val alertDialog: AlertDialog = builder.create()
+        alertDialog.show()
+    }
+
     private fun initUi() {
         binding.rvCharacters.layoutManager = GridLayoutManager(requireContext(), 2)
         binding.rvCharacters.itemAnimator = DefaultItemAnimator()
@@ -86,7 +100,7 @@ class HomeFragment : Fragment(), CharacterItemAdapter.ItemClickCallback {
     }
 
     private fun viewProgressBar(isShow: Boolean) {
-        binding.progressBar.visibility = if (isShow) View.VISIBLE else View.GONE
+        binding.loadingProgress.visibility = if (isShow) View.VISIBLE else View.GONE
     }
 
     private fun setCharacterAdapter(response: CharacterResponse) {
