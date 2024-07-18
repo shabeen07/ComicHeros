@@ -12,18 +12,28 @@ class HomeViewModel : ViewModel() {
 
     private var _characters = MutableLiveData<Resource<CharacterResponse>>()
     val characters: MutableLiveData<Resource<CharacterResponse>> get() = _characters
+    private var currentPage: Int = 1
 
     init {
         getCharacters()
     }
 
     // get characters
-    private fun getCharacters(page: Int = 1) {
+    fun getCharacters() {
         viewModelScope.launch {
-            CharacterRepository.getCharacters(page)
+            CharacterRepository.getCharacters(currentPage)
                 .collect {
                     _characters.value = it
                 }
         }
     }
+
+    fun setPage(page: Int) {
+        currentPage = page
+    }
+
+    fun getPageNo(): Int {
+       return currentPage
+    }
+
 }

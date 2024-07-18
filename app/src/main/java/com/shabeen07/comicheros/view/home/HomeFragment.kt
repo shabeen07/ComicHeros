@@ -13,21 +13,25 @@ import androidx.appcompat.app.AlertDialog
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.DefaultItemAnimator
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.shabeen07.comicheros.R
 import com.shabeen07.comicheros.adapters.CharacterItemAdapter
 import com.shabeen07.comicheros.api.Resource
 import com.shabeen07.comicheros.databinding.FragmentHomeBinding
 import com.shabeen07.comicheros.models.CharacterItem
 import com.shabeen07.comicheros.models.CharacterResponse
+import com.shabeen07.comicheros.utils.PaginationScrollListener
 
 class HomeFragment : Fragment(), CharacterItemAdapter.ItemClickCallback {
 
     private val viewModel: HomeViewModel by viewModels()
     private lateinit var binding: FragmentHomeBinding
     private lateinit var navController: NavController
+    private lateinit var characterItemAdapter: CharacterItemAdapter
+    private var characterList = mutableListOf<CharacterItem>()
+    private var isLoading = false
+    private var isLastPage = false
+    private val totalPages = 10
 
     companion object{
         private const val TAG = "HomeFragment"
@@ -85,18 +89,58 @@ class HomeFragment : Fragment(), CharacterItemAdapter.ItemClickCallback {
     }
 
     private fun initUi() {
-        binding.rvCharacters.layoutManager = GridLayoutManager(requireContext(), 2)
+        val linearLayoutManager = GridLayoutManager(requireContext(), 2)
+        binding.rvCharacters.layoutManager = linearLayoutManager
         binding.rvCharacters.itemAnimator = DefaultItemAnimator()
+        characterItemAdapter = CharacterItemAdapter(requireContext(),characterList,this)
+        binding.rvCharacters.adapter = characterItemAdapter
 
+        // refresh layout
         binding.swipeRefreshLayout.setOnRefreshListener {
             // load products
             Handler(Looper.getMainLooper()).postDelayed({
                 // Load characters
-                // shopViewModel.getProducts()
+                reloadCharacters()
 
                 binding.swipeRefreshLayout.isRefreshing = false
             }, 1500)
         }
+
+        // Add the pagination scroll listener
+        binding.rvCharacters.addOnScrollListener(object : PaginationScrollListener(linearLayoutManager) {
+            override fun loadMoreItems() {
+                isLoading = true
+                val currentPage = viewModel.getPageNo()
+                viewModel.setPage(currentPage+1)
+                if (currentPage <= totalPages) {
+                    // Simulate network latency for API call
+                    Handler(Looper.getMainLooper()).postDelayed({
+                       viewModel.getCharacters()
+                    }, 1500)
+                }
+            }
+
+            override fun getTotalPageCount(): Int {
+                return totalPages
+            }
+
+            override fun isLastPage(): Boolean {
+                return isLastPage
+            }
+
+            override fun isLoading(): Boolean {
+                return isLoading
+            }
+        })
+
+    }
+
+    private fun reloadCharacters() {
+        // clear list
+        characterItemAdapter.clearAll()
+
+        viewModel.setPage(1)
+        viewModel.getCharacters()
     }
 
     private fun viewProgressBar(isShow: Boolean) {
@@ -105,8 +149,7 @@ class HomeFragment : Fragment(), CharacterItemAdapter.ItemClickCallback {
 
     private fun setCharacterAdapter(response: CharacterResponse) {
         response.results?.let { characterList ->
-            val shopAdapter = CharacterItemAdapter(requireContext(), characterList, this)
-            binding.rvCharacters.adapter = shopAdapter
+            characterItemAdapter.addAll(characterList)
         }
     }
 

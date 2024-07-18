@@ -11,7 +11,7 @@ import com.shabeen07.comicheros.databinding.CharacterItemRowBinding
 import com.shabeen07.comicheros.models.CharacterItem
 
 class CharacterItemAdapter(
-    private val context: Context, private var characterList: List<CharacterItem>,
+    private val context: Context, private var characterList: MutableList<CharacterItem>,
     private val itemClickCallback: ItemClickCallback
 ) :
     RecyclerView.Adapter<CharacterItemAdapter.MyHolder>() {
@@ -28,6 +28,16 @@ class CharacterItemAdapter(
 
     override fun getItemCount(): Int {
         return characterList.size
+    }
+
+    fun addAll(characterList: List<CharacterItem>) {
+        this.characterList.addAll(characterList)
+        notifyDataSetChanged()
+    }
+
+    fun clearAll() {
+        this.characterList.clear()
+        notifyDataSetChanged()
     }
 
     override fun onBindViewHolder(holder: MyHolder, position: Int) {
