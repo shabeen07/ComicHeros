@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.Navigation
@@ -33,6 +34,11 @@ class LoginFragment : Fragment() {
         // set default value
         fragmentLoginBinding.edEmail.setText(Constants.EMAIL)
         fragmentLoginBinding.edPassword.setText(Constants.PASSWORD)
+        // This callback will only be called when MyFragment is at least Started.
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            // Handle the back button event
+            requireActivity().finish()
+        }
 
         navController = Navigation.findNavController(view)
 
