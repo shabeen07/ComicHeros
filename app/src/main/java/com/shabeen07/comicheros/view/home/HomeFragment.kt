@@ -34,7 +34,7 @@ class HomeFragment : Fragment(), CharacterItemAdapter.ItemClickCallback {
     private var isLastPage = false
     private val totalPages = 10
 
-    companion object {
+    companion object{
         private const val TAG = "HomeFragment"
     }
 
@@ -64,6 +64,7 @@ class HomeFragment : Fragment(), CharacterItemAdapter.ItemClickCallback {
                     viewProgressBar(false)
                     // show error dialog
                     showAlertDialog(it.message)
+                    isLoading = false
                 }
 
                 is Resource.Loading -> {
@@ -77,6 +78,7 @@ class HomeFragment : Fragment(), CharacterItemAdapter.ItemClickCallback {
                     viewProgressBar(false)
                     // set adapter
                     setCharacterAdapter(it.data)
+                    isLoading = false
                 }
             }
         }
@@ -109,20 +111,20 @@ class HomeFragment : Fragment(), CharacterItemAdapter.ItemClickCallback {
                 reloadCharacters()
 
                 binding.swipeRefreshLayout.isRefreshing = false
-            }, 1500)
+            }, 1000)
         }
 
         // Add the pagination scroll listener
         binding.rvCharacters.addOnScrollListener(object : PaginationScrollListener(linearLayoutManager) {
             override fun loadMoreItems() {
                 isLoading = true
-                val currentPage = viewModel.getPageNo()
+                val currentPage = viewModel.currentPage
                 viewModel.setPage(currentPage+1)
                 if (currentPage <= totalPages) {
                     // Simulate network latency for API call
                     Handler(Looper.getMainLooper()).postDelayed({
                        viewModel.getCharacters()
-                    }, 1500)
+                    }, 2000)
                 }
             }
 

@@ -12,7 +12,9 @@ class HomeViewModel : ViewModel() {
 
     private var _characters = MutableLiveData<Resource<CharacterResponse>>()
     val characters: MutableLiveData<Resource<CharacterResponse>> get() = _characters
-    private var currentPage: Int = 1
+    private var _currentPage: MutableLiveData<Int> = MutableLiveData(1)
+    val currentPage: Int get() = _currentPage.value ?: 1
+
 
     init {
         getCharacters()
@@ -29,11 +31,7 @@ class HomeViewModel : ViewModel() {
     }
 
     fun setPage(page: Int) {
-        currentPage = page
-    }
-
-    fun getPageNo(): Int {
-       return currentPage
+        _currentPage.value = page
     }
 
 }
